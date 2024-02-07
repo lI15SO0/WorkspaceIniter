@@ -23,7 +23,7 @@ struct Args {
     force: bool,
 }
 
-const PROFILES_DIR_NAME : &str = "profiles";
+const PROFILES_DIR_NAME: &str = "profiles";
 const PROFILE_SUFFIX: &str = ".bincode";
 
 fn main() {
@@ -38,14 +38,21 @@ fn main() {
         line.trim().to_owned()
     });
 
-    let profile_target = get_os_config_dir() + PROFILES_DIR_NAME + &get_os_dir_sep() + &name + PROFILE_SUFFIX;
+    let profile_target =
+        get_os_config_dir() + PROFILES_DIR_NAME + &get_os_dir_sep() + &name + PROFILE_SUFFIX;
     let profile = DirRoot::from_dir(path).unwrap_or_else(|err| {
         // TODO: Maybe not friendly.
         eprintln!("E: Failed to get dir infomations. cause: {}", err);
         exit(1);
     });
 
-    ensure_dirs();
+    match ensure_dirs() {
+        Ok(_) => {}
+        Err(err) => {
+            eprintln!("E: Failed to init config dir: {}", err);
+            exit(1)
+        }
+    };
 
     is_exists(&profile_target, args.force);
     match profile.save_as(&profile_target) {
@@ -54,11 +61,12 @@ fn main() {
     };
 }
 
-fn ensure_dirs() {
+fn ensure_dirs() -> Result<(), std::io::Error> {
     let p = get_os_config_dir() + PROFILES_DIR_NAME;
     if File::open(&p).is_err() {
-        let _ = create_dir_all(p);
+        let _ = create_dir_all(p)?;
     }
+    Ok(())
 }
 
 fn is_exists(path: &str, force: bool) {

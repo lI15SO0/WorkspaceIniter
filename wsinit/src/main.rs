@@ -3,7 +3,7 @@ use paths::{get_os_config_dir, get_os_dir_sep, get_profile_path};
 use profile::DirRoot;
 use settings::{Settings, Wsinit};
 use std::{
-    fs,
+    fs::{self, create_dir_all, File},
     process::exit,
 };
 
@@ -34,12 +34,27 @@ const SETTING_NAME: &str = "settings.toml";
 const PROFILES_DIR_NAME: &str = "profiles";
 const _PROFILE_SUFFIX: &str = ".bincode";
 
+fn ensure_dirs() -> Result<(), std::io::Error> {
+    let p = get_os_config_dir() + PROFILES_DIR_NAME;
+    if File::open(&p).is_err() {
+        let _ = create_dir_all(p)?;
+    }
+    Ok(())
+}
+
 fn main() {
     let args = Args::parse();
     multi_operation_checker(&args);
 
     let settings = {
         let path = get_os_config_dir() + SETTING_NAME;
+        match ensure_dirs() {
+            Ok(_) => {}
+            Err(err) => {
+                eprintln!("E: Failed to init config dir: {}", err);
+                exit(1)
+            }
+        };
         Settings::read_from(&path).unwrap_or_else(|err| {
             if err.0 == 1 {
                 let settings = Settings {
@@ -104,7 +119,7 @@ fn build_workspace(settings: Settings, args: Args) {
         .profile
         .clone()
         .unwrap_or(get_default_profile(&settings));
-    if profile_name == "None" {
+    if profile_name == "" {
         println!("E: Not give a profile name, and not set default profile.");
         exit(0);
     }
