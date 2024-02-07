@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = ["mkwsconfig", "wsinit", "profile", "paths", "settings"]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["lI15SO0"]
+description = "An easy way to init workspace."
