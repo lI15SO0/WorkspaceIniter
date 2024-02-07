@@ -1,10 +1,9 @@
 use clap::{command, Parser};
 use paths::{get_os_config_dir, get_os_dir_sep, get_profile_path};
-use profile::{DirRoot, FileInfo};
+use profile::DirRoot;
 use settings::{Settings, Wsinit};
 use std::{
-    fs::{self, File},
-    io::Write,
+    fs,
     process::exit,
 };
 
@@ -33,7 +32,7 @@ struct Args {
 const SETTING_NAME: &str = "settings.toml";
 
 const PROFILES_DIR_NAME: &str = "profiles";
-const PROFILE_SUFFIX: &str = ".bincode";
+const _PROFILE_SUFFIX: &str = ".bincode";
 
 fn main() {
     let args = Args::parse();
