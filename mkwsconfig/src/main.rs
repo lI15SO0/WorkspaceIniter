@@ -9,18 +9,21 @@ use paths::{get_os_config_dir, get_os_dir_sep};
 
 use profile::*;
 
-#[derive(Parser)]
-#[command(
-    author = "lI15SO0",
-    version,
-    about = "Save current dir as a profile file."
-)]
+/// Save current dir as a profile file.
+#[derive(Parser, Debug)]
+#[command(author = "lI15SO0", version, about)]
 struct Args {
+    /// Profile name
     #[arg(short, long)]
     name: Option<String>,
 
+    /// Force create profile.
     #[arg(short, long)]
     force: bool,
+
+    /// Allow empty files.
+    #[arg(short, long)]
+    raw: bool,
 }
 
 const PROFILES_DIR_NAME: &str = "profiles";
@@ -40,11 +43,18 @@ fn main() {
 
     let profile_target =
         get_os_config_dir() + PROFILES_DIR_NAME + &get_os_dir_sep() + &name + PROFILE_SUFFIX;
-    let profile = DirRoot::from_dir(path).unwrap_or_else(|err| {
-        // TODO: Maybe not friendly.
-        eprintln!("E: Failed to get dir infomations. cause: {}", err);
-        exit(1);
-    });
+
+    let profile = match args.raw {
+        true => DirRoot::from_dir_raw(path).unwrap_or_else(|err| {
+            // TODO: Maybe not friendly.
+            eprintln!("E: Failed to get dir infomations. cause: {}", err);
+            exit(1);
+        }),
+        false => DirRoot::from_dir(path).unwrap_or_else(|err| {
+            eprintln!("E: Failed to get dir infomations. cause: {}", err);
+            exit(1);
+        }),
+    };
 
     match ensure_dirs() {
         Ok(_) => {}

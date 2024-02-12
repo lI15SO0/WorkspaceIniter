@@ -44,7 +44,11 @@ impl DirRoot {
     }
 
     pub fn from_dir(path: String) -> Result<Self, std::io::Error> {
-        get_dirs(String::new(), path)
+        get_dirs(String::new(), path, false)
+    }
+
+    pub fn from_dir_raw(path: String) -> Result<Self, std::io::Error>  {
+        get_dirs(String::new(), path, true)
     }
 
     pub fn save_as(self: &Self, path: &str) -> Result<(), String> {
@@ -167,7 +171,7 @@ impl FileInfo {
 // =============================================================================
 // =============================================================================
 
-fn get_dirs(name: String, prefix: String) -> Result<DirRoot, std::io::Error> {
+fn get_dirs(name: String, prefix: String, raw: bool) -> Result<DirRoot, std::io::Error> {
     let mut ret = DirRoot {
         name: name.clone(),
         dirs: vec![],
@@ -186,13 +190,17 @@ fn get_dirs(name: String, prefix: String) -> Result<DirRoot, std::io::Error> {
 
         if f_type.is_dir() {
             // TODO: May cause unfriendly operation.
-            let next_root = get_dirs(f_name, prefix.clone() + &name + &get_os_dir_sep())?;
+            let next_root = get_dirs(f_name, prefix.clone() + &name + &get_os_dir_sep(), raw)?;
+
+            if next_root.dirs.is_empty() && next_root.files.is_empty() && !raw {
+                continue;
+            }
             ret.dirs.push(next_root);
         } else if f_type.is_file() {
             let mut buf: Vec<u8> = vec![];
             let _ = File::open(f_path)?.read_to_end(&mut buf);
 
-            if buf.is_empty() {
+            if buf.is_empty() && !raw {
                 continue;
             }
 

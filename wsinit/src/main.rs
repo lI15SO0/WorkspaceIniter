@@ -7,24 +7,31 @@ use std::{
     process::exit,
 };
 
+/// Init workspace by profile file.
 #[derive(Parser)]
-#[command(author = "lI15SO0", version, about = "Init workspace by profile file.")]
+#[command(author = "lI15SO0", version, about)]
 struct Args {
+    /// Name of profile.
     #[arg(short = 'c', long)]
     profile: Option<String>,
 
+    /// Where to init. (default: ./)
     #[arg(short = 'd', long)]
     target: Option<String>,
 
+    /// Show the files and dirs what will be create.
     #[arg(short, long)]
     print: bool,
 
+    /// Force mode.
     #[arg(short, long)]
     force: bool,
 
+    /// List of profiles.
     #[arg(short, long)]
     list: bool,
 
+    /// Set default profile.
     #[arg(short, long = "set-default")]
     setdefault: bool,
 }
