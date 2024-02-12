@@ -98,7 +98,7 @@ impl DirRoot {
                 println!("\t{}", prefix.clone() + &get_os_dir_sep() + &i.name);
             }
             for i in &root.dirs {
-                print_files(&i, root.name.clone() + &get_os_dir_sep() + &i.name);
+                print_files(&i, prefix.clone() + &get_os_dir_sep() + &i.name);
             }
         }
 
