@@ -4,7 +4,7 @@ use profile::DirRoot;
 use settings::{Settings, Wsinit};
 use std::{
     fs::{self, create_dir_all, File},
-    process::exit,
+    process::{exit, Stdio},
 };
 
 /// Init workspace by profile file.
@@ -186,6 +186,30 @@ fn build_workspace_from_root(dir_root: DirRoot, target: &str) {
             exit(1);
         }
     };
+
+    #[cfg(feature = "init_script")]
+    {
+        if dir_root.files.iter().fold(false, |has, f| {
+            if f.name == "init.sh" {
+                println!("Detected init.sh, Running init script.");
+                println!("{}", "-".repeat(30));
+                true
+            } else {
+                has
+            }
+        }) {
+            match std::process::Command::new("sh")
+                .arg("init.sh")
+                .stdin(Stdio::inherit())
+                .status()
+            {
+                Ok(_) => {}
+                Err(e) => {
+                    println!("E: {}", e);
+                }
+            }
+        }
+    }
 }
 
 fn check_repeat(dir_root: &DirRoot, target: &str) {

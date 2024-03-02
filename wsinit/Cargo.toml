@@ -12,3 +12,7 @@ clap = { version = "4.4.18", features = ["derive"] }
 profile = {path = "../profile/"}
 paths = {path = "../paths/"}
 settings = {path = "../settings/"}
+
+[features]
+default = ["init_script"]
+init_script = []
