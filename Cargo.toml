@@ -3,6 +3,6 @@ resolver = "2"
 members = ["mkwsconfig", "wsinit", "profile", "paths", "settings"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.2"
 authors = ["lI15SO0"]
 description = "An easy way to init workspace."
