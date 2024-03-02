@@ -141,11 +141,13 @@ fn build_workspace(settings: Settings, args: Args) {
 
     let target = args.target.unwrap_or("./".to_string());
 
-    build_workspace_from_root(dir_root, &target);
+    build_workspace_from_root(dir_root, &target, args.force);
 }
 
-fn build_workspace_from_root(dir_root: DirRoot, target: &str) {
-    check_repeat(&dir_root, target);
+fn build_workspace_from_root(dir_root: DirRoot, target: &str, force_mode: bool) {
+    if !force_mode {
+        check_repeat(&dir_root, target);
+    }
 
     let target = {
         if target.ends_with('/') || target.ends_with('\\') {
