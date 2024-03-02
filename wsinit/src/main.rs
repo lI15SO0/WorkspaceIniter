@@ -31,6 +31,11 @@ struct Args {
     #[arg(short, long)]
     list: bool,
 
+    /// Don't run init.sh
+    #[cfg(feature = "init_script")]
+    #[arg(long)]
+    no_init: bool,
+
     /// Set default profile.
     #[arg(short, long = "set-default")]
     setdefault: bool,
@@ -68,12 +73,12 @@ fn main() {
                     wsinit: Wsinit::new(),
                 };
                 settings.write(&path).expect("E: Failed to init settings.");
-                return settings;
+                settings
             } else {
                 eprintln!("W: Error in reading settings cause: {}", err.1);
-                return Settings {
+                Settings {
                     wsinit: Wsinit::new(),
-                };
+                }
             }
         })
     };
@@ -139,13 +144,13 @@ fn build_workspace(settings: Settings, args: Args) {
         })
     };
 
-    let target = args.target.unwrap_or("./".to_string());
+    let target = &args.target.clone().unwrap_or("./".to_string());
 
-    build_workspace_from_root(dir_root, &target, args.force);
+    build_workspace_from_root(dir_root, &target, &args);
 }
 
-fn build_workspace_from_root(dir_root: DirRoot, target: &str, force_mode: bool) {
-    if !force_mode {
+fn build_workspace_from_root(dir_root: DirRoot, target: &str, args: &Args) {
+    if !args.force {
         check_repeat(&dir_root, target);
     }
 
@@ -175,7 +180,7 @@ fn build_workspace_from_root(dir_root: DirRoot, target: &str, force_mode: bool) 
                 size
             );
         }
-        return Ok(());
+        Ok(())
     }
 
     match _build(&dir_root, &target) {
@@ -191,23 +196,25 @@ fn build_workspace_from_root(dir_root: DirRoot, target: &str, force_mode: bool) 
 
     #[cfg(feature = "init_script")]
     {
-        if dir_root.files.iter().fold(false, |has, f| {
-            if f.name == "init.sh" {
-                println!("Detected init.sh, Running init script.");
-                println!("{}", "-".repeat(30));
-                true
-            } else {
-                has
-            }
-        }) {
-            match std::process::Command::new("sh")
-                .arg("init.sh")
-                .stdin(Stdio::inherit())
-                .status()
-            {
-                Ok(_) => {}
-                Err(e) => {
-                    println!("E: {}", e);
+        if !args.no_init {
+            if dir_root.files.iter().fold(false, |has, f| {
+                if f.name == "init.sh" {
+                    println!("Detected init.sh, Running init script.");
+                    println!("{}", "-".repeat(30));
+                    true
+                } else {
+                    has
+                }
+            }) {
+                match std::process::Command::new("sh")
+                    .arg("init.sh")
+                    .stdin(Stdio::inherit())
+                    .status()
+                {
+                    Ok(_) => {}
+                    Err(e) => {
+                        println!("E: {}", e);
+                    }
                 }
             }
         }
