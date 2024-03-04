@@ -46,6 +46,30 @@ cp ./target/release/wsinit ./target/release/mkwsconfig /usr/local/bin/
 
 ## Usage
 
+Use "mkwsconfig" to generate current dir's bincode.
+
+example:
+
+``` sh
+mkwsconfig -c example -r
+```
+
+Use command "wsinit" to build up workspace via bincode.
+
+``` sh
+wsinit -c example
+```
+
+If workspace has "init.sh" file, and os had install "sh" or "bash".
+
+Then wsinit will run "init.sh" via "sh" command, after build up.
+
+Or can cancle to run "init.sh" by "--no-init" arg.
+
+example:
+
+https://asciinema.org/a/QkIiYxTOUOYM4wSGgZHGFdBRN
+
 ### mkwsconfig
 
 ```
