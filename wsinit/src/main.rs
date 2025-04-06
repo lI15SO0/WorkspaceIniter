@@ -33,7 +33,7 @@ struct Args {
 
     /// Don't run init.sh
     #[cfg(feature = "init_script")]
-    #[arg(long)]
+    #[arg(short = 'r', long)]
     no_init: bool,
 
     /// Set default profile.
