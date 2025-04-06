@@ -1,4 +1,4 @@
-# WorkspaceIniter - an easy way to init workspace in cli.
+# wsinit - an easy way to init workspace in cli.
 
 ---
 
