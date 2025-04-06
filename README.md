@@ -98,6 +98,7 @@ Options:
   -p, --print              Show the files and dirs what will be create
   -f, --force              Force mode
   -l, --list               List of profiles
+  -r, --no-init            Don't run init.sh
   -s, --set-default        Set default profile
   -h, --help               Print help
   -V, --version            Print version
